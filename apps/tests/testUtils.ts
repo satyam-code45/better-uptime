@@ -1,8 +1,5 @@
 import axios from "axios";
 import { BACKEND_URL } from "./config";
-import { password } from "bun";
-
-
 const USER_NAME = Math.random().toString();
 
 export async function createUser(): Promise<{id: string, jwt: string}> {
