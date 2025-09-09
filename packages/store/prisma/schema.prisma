@@ -22,8 +22,8 @@ model Website {
   timeAdded DateTime       @default(now())
   ticks     WebsiteTicks[]
 
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
+  user_id String
+  user   User   @relation(fields: [user_id], references: [id])
 }
 
 model Region {

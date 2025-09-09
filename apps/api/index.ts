@@ -3,21 +3,18 @@ import { prismaClient } from "store/client";
 import { CreateUserInput, SignInInput } from "./types";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { authMiddleware } from "./middleware";
 
 const app = express();
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.status(200).json({
-    message: "Hello from better uptime!",
-  });
-});
-app.post("/website", async (req, res) => {
-  console.log(req.body.url);
+app.post("/website", authMiddleware, async (req, res) => {
+  console.log("UserId: ", req.userId);
 
   const website = await prismaClient.website.create({
     data: {
       url: req.body.url,
+      user_id: req.userId!,
     },
   });
   res.status(200).json({
@@ -26,9 +23,34 @@ app.post("/website", async (req, res) => {
   });
 });
 
-app.get("/status/:website", (req, res) => {
+app.get("/status/:websiteId", authMiddleware, async (req, res) => {
+  const website = await prismaClient.website.findFirst({
+    where: {
+      user_id: req.userId,
+      id: req.params.websiteId,
+    },
+    include: {
+      ticks: {
+        orderBy: [
+          {
+            created_at: "desc",
+          },
+        ],
+        take: 1,
+      },
+    },
+  });
+
+  if (!website) {
+    res.status(409).json({
+      message: "Website not found!",
+    });
+    return;
+  }
+
   res.status(200).json({
-    message: "Hello from better uptime!",
+    message: "Website found!",
+    website,
   });
 });
 
@@ -109,7 +131,6 @@ app.post("/user/sign-in", async (req, res) => {
       });
       return;
     }
-
     const token = jwt.sign(user.id, process.env.JWT_SECRET!);
 
     res.status(200).json({
