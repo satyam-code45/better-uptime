@@ -4,11 +4,11 @@ import { createUser } from "./testUtils";
 import { BACKEND_URL } from "./config";
 
 describe("Website gets created", () => {
-  let jwt: string, token: string;
+  let token: string;
 
   beforeAll(async () => {
     const data = await createUser();
-    ((jwt = data.jwt), (token = data.jwt));
+    token = data.jwt;
   });
 
   it("Website not created if url is not present", async () => {
