@@ -6,7 +6,10 @@ export function authMiddleware(
   res: Response,
   next: NextFunction
 ) {
-  const headers = req.headers.authorization!;
+  const headers = req.headers.authorization;
+  if (!headers) {
+    return res.status(401).json({ message: "Authorization header missing" });
+  }
   try {
    
     let data = jwt.verify(headers, process.env.JWT_SECRET!);
