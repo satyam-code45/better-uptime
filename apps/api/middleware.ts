@@ -12,8 +12,8 @@ export function authMiddleware(
   }
   try {
    
-    let data = jwt.verify(headers, process.env.JWT_SECRET!) as { userId?: string; sub?: string };
-    req.userId = data.userId ?? data.sub;
+    let data = jwt.verify(headers, process.env.JWT_SECRET!);
+    req.userId = data as string;
     next();
   } catch (error) {
     console.log(error);

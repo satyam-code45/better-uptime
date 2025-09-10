@@ -131,7 +131,7 @@ app.post("/user/sign-in", async (req, res) => {
       });
       return;
     }
-    const token = jwt.sign(user.id, process.env.JWT_SECRET!);
+     const token = jwt.sign(user.id, process.env.JWT_SECRET!);
 
     res.status(200).json({
       message: "Signed in Successfully!",
