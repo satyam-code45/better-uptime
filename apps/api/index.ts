@@ -50,7 +50,9 @@ app.get("/status/:websiteId", authMiddleware, async (req, res) => {
 
   res.status(200).json({
     message: "Website found!",
-    website,
+    url: website.url,
+    user_id: website.user_id,
+    id: website.id
   });
 });
 

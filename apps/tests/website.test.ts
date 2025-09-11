@@ -55,3 +55,71 @@ describe("Website gets created", () => {
     } catch (e) {}
   });
 });
+
+describe("Can fetch websites", () => {
+  let token1: string, userId1: string;
+  let token2: string, userId2: string;
+
+  beforeAll(async () => {
+    const data1 = await createUser();
+    token1 = data1.jwt;
+    userId1 = data1.id;
+
+    const data2 = await createUser();
+    token2 = data2.jwt;
+    userId2 = data2.id;
+  });
+
+  it("Is able to fetch a website that the user created", async () => {
+    const websiteResponse = await axios.post(
+      `${BACKEND_URL}/website`,
+      {
+        url: "https://google.com",
+      },
+      {
+        headers: {
+          Authorization: token1,
+        },
+      }
+    );
+
+    const getWebsiteResponse = await axios.get(
+      `${BACKEND_URL}/status/${websiteResponse.data.id}`,
+      {
+        headers: {
+          Authorization: token1,
+        },
+      }
+    );
+    console.log(getWebsiteResponse.data);
+    
+    expect(getWebsiteResponse.data.id).toBe(websiteResponse.data.id);
+    expect(getWebsiteResponse.data.user_id).toBe(userId1);
+  });
+
+  it("Can't access website created by other user", async () => {
+    const websiteResponse = await axios.post(
+      `${BACKEND_URL}/website`,
+      {
+        url: "https://google.com",
+      },
+      {
+        headers: {
+          Authorization: token1,
+        },
+      }
+    );
+
+    try {
+      await axios.get(
+        `${BACKEND_URL}/status/${websiteResponse.data.id}`,
+        {
+          headers: {
+            Authorization: token2,
+          },
+        }
+      );
+      expect(false, "Shouldn't be able to access website of another user");
+    } catch (error) {}
+  });
+});
